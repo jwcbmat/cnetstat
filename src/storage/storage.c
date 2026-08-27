@@ -2,8 +2,14 @@
 #include "../server/server.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <errno.h>
 
-const char* storagef = "storage/backup/data.txt";
+#define LOG(s) fputs(s, stderr)
+
+char storagef[PATH_MAX];
 FILE* file;
 
 
@@ -42,7 +48,28 @@ int wipe_backup() {
 }
 
 void storage_start() {
-    printf("starting storage... \n");
+    LOG("Starting storage... \n");
+    char *cwd = getcwd(NULL, 0);
+    if (cwd == NULL) {
+        perror("getcwd() error");
+        exit(1);
+    }
+
+    char backup_path[PATH_MAX];
+    snprintf(backup_path, sizeof(backup_path), "%s/backup", cwd);
+    if (mkdir(backup_path, 0777) == -1)
+    {
+      if (errno != EEXIST)
+      {
+        perror("Error creating backup directory");
+        free(cwd);
+        exit(1);
+      }
+    }
+
+    snprintf(storagef, sizeof(storagef), "%s/backup/data.txt", cwd);
+    free(cwd);
+
     write_data_on_backup();
     load_to_memory_from_backup();
 }
