@@ -1,0 +1,1 @@
+void storage_start();
