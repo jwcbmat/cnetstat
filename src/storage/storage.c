@@ -14,7 +14,7 @@ FILE* file;
 
 
 int write_data_on_backup() {
-  //TODO: ler os dados aqui e alocar
+  //TODO: get data stream and alocate it into a variable to persist it;
   char message[] = "Hello, Persistence\n";
 
   file = fopen(storagef, "a+");
@@ -34,7 +34,7 @@ int load_to_memory_from_backup() {
 
   fgets(line, sizeof(line), file);
   do {
-    //TODO: ao inves de imprimir, popular os dados com uma lista encadeada.
+    //TODO: populate the data from backup into a linked list;
     printf("%s", line);
 
     fgets(line, sizeof(line), file);
@@ -44,7 +44,9 @@ int load_to_memory_from_backup() {
 }
 
 int wipe_backup() {
-  return remove(storagef);
+  file = fopen(storagef, "w");
+  fflush(file);
+  return 0;
 }
 
 void storage_start() {

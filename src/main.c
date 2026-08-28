@@ -5,7 +5,7 @@
 
 int main()
 {
-    server_start();
+    //server_start();
     storage_start();
 
     printf("hello, world! \n");
