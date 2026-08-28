@@ -1,0 +1,19 @@
+#!/bin/bash
+
+file_msg=$1
+
+read first_line < $file_msg
+
+prefix=("fix" "feat" "chore" "ci" "docs" "style" "refactor" "perf" "test")
+valid=0
+for p in "${prefix[@]}"; do
+    if [[ "$first_line" == "$p":?* ]]; then
+        valid=1
+        break
+    fi
+done
+
+if [ $valid == 0 ]; then
+    echo "invalid commit message. use: <type>: <description> (fix, feat, chore, ci, docs, style, refactor, perf, test)"
+    exit 1
+fi
