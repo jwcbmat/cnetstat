@@ -12,55 +12,80 @@
 #define LOG(s) fputs(s, stderr)
 
 char storagef[PATH_MAX];
+char data_path[PATH_MAX];
 FILE* file;
+sqlite3 *db = NULL;
 
+void db_start() {
+  LOG("Creating database... \n");
+  char* errMsg =  NULL;
+  char query[] = "CREATE TABLE data_test(id INTEGER PRIMARY KEY AUTOINCREMENT, message TEXT)";
+  sqlite3_open(data_path, &db);
+  int result = sqlite3_exec(db, query, 0, 0,&errMsg);
 
-int write_data_on_backup() {
-  //TODO: get data stream and alocate it into a variable to persist it;
-  char message[] = "Hello, Persistence\n";
+  if (result != SQLITE_OK && errMsg != NULL) {
+    printf("Error starting database. Error: %s\n", errMsg);
+    sqlite3_free(errMsg);
+  }
+}
 
+int file_write_callback(void* data, int argc, char** argv, char** azColName) {
+  DataTest* messages = (DataTest*)data;
+  snprintf(messages->message, sizeof(messages->message), "%s",argv[1]);
   file = fopen(storagef, "a+");
   if (!file) {
     perror("Could not open file");
     return EXIT_FAILURE;
   }
-  fputs(message, file);
+  const char* result = messages->message;
+  fputs(result, file);
   fclose(file);
-
   return 0;
 }
 
-int load_to_memory_from_backup() {
+void write_data_on_backup() {
+  char* errMsg =  NULL;
+  DataTest message = {0, ""};
+  sqlite3_open(data_path, &db);
+  int result = sqlite3_exec(db, "SELECT * FROM data_test", file_write_callback, &message, &errMsg);
+  if (result != SQLITE_OK && errMsg != NULL) {
+    printf("Error retrieving from database. Error: %s", errMsg);
+    sqlite3_free(errMsg);
+  }
+}
+
+void load_to_memory_from_backup() {
+  char* errMsg =  NULL;
   file = fopen( storagef, "r");
   char line[256];
 
+
+  sqlite3_open(data_path, &db);
+  const char *delete_query = "DELETE FROM data_test";
+  int result = sqlite3_exec(db, delete_query, 0, 0,&errMsg);
+  if (result != SQLITE_OK && errMsg != NULL){
+    printf("Error reseting database. Error: %s", errMsg);
+    sqlite3_free(errMsg);
+  }
+
   fgets(line, sizeof(line), file);
   do {
-    //TODO: populate the data from backup into a linked list;
-    printf("%s", line);
-
+    char query[PATH_MAX];
+    snprintf(query, sizeof(query), "INSERT INTO data_test(message) VALUES('%s')", line);
+    result = sqlite3_exec(db, query, 0, 0,&errMsg);
+    if (result != SQLITE_OK && errMsg != NULL){
+      printf("Error inserting into database. Error: %s", errMsg);
+      sqlite3_free(errMsg);
+    }
     fgets(line, sizeof(line), file);
   } while (feof(file) == 0);
-
-  return 0;
 }
 
-int wipe_backup() {
+void wipe_backup() {
   file = fopen(storagef, "w");
   fflush(file);
-  return 0;
 }
 
-void db_start(const char *cwd) {
-  LOG("Creating database... \n");
-  printf("%s", cwd);
-  sqlite3 *db = NULL;
-  char data_path[PATH_MAX];
-  snprintf(data_path, sizeof(data_path), "%s/database", cwd);
-  sqlite3_open(data_path, &db);
-  char query[] = "CREATE TABLE data_test(id INTEGER PRIMARY KEY AUTOINCREMENT, message TEXT)";
-  sqlite3_exec(db, query, 0, 0,0);
-}
 
 void storage_start() {
     LOG("Starting storage... \n");
@@ -69,7 +94,8 @@ void storage_start() {
         perror("getcwd() error");
         exit(1);
     }
-    db_start(cwd);
+    snprintf(storagef, sizeof(storagef), "%s/backup/data.txt", cwd);
+    snprintf(data_path, sizeof(data_path), "%s/database", cwd);
 
     char backup_path[PATH_MAX];
     snprintf(backup_path, sizeof(backup_path), "%s/backup", cwd);
@@ -83,9 +109,6 @@ void storage_start() {
       }
     }
 
-    snprintf(storagef, sizeof(storagef), "%s/backup/data.txt", cwd);
+    db_start();
     free(cwd);
-
-    write_data_on_backup();
-    load_to_memory_from_backup();
 }
