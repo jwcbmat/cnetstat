@@ -21,7 +21,7 @@ char* get_data_by_id(const int id) {
   snprintf(query, sizeof(query), "SELECT message FROM data_test WHERE id = %d", id);
   int result = sqlite3_exec(db, query, return_write_callback, &messages, &errMsg);
   if (result != SQLITE_OK && errMsg != NULL) {
-    printf("Error getting data. Error: %s", errMsg);
+    printf("Error getting data. Error: %s\n", errMsg);
     sqlite3_free(errMsg);
   }else if (strcmp(messages.message, "") == 0) {
     return errMsg;

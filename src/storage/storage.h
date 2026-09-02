@@ -4,8 +4,8 @@
 
 void storage_start();
 void wipe_backup();
-void write_data_on_backup();
-void load_to_memory_from_backup();
+void backup_data();
+void restore_from_backup();
 
 extern sqlite3 *db;
 extern char data_path[PATH_MAX];

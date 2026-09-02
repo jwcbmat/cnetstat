@@ -43,7 +43,8 @@ int file_write_callback(void* data, int argc, char** argv, char** azColName) {
   return 0;
 }
 
-void write_data_on_backup() {
+void backup_data() {
+  wipe_backup();
   char* errMsg =  NULL;
   DataTest message = {0, ""};
   sqlite3_open(data_path, &db);
@@ -54,7 +55,7 @@ void write_data_on_backup() {
   }
 }
 
-void load_to_memory_from_backup() {
+void restore_from_backup() {
   char* errMsg =  NULL;
   file = fopen( storagef, "r");
   char line[256];
