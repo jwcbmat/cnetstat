@@ -12,9 +12,9 @@ void server_start()
     int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
     struct sockaddr_in server_addr;
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(8000);
-    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_family = AF_INET; // sets the protocol to ipv4
+    server_addr.sin_port = htons(8000); // the port the server runs on
+    server_addr.sin_addr.s_addr = INADDR_ANY; // what ports the server accepts requests from (_ANY sets to all local ports)
 
     bind(socket_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     listen(socket_fd, 10);

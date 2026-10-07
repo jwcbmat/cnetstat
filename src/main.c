@@ -12,9 +12,9 @@ char option[10];
 int main()
 {
     storage_start();
+    server_start();
   /* 
     * TESTING NEW FUNCTIONS ON MAIN:
-    server_start();
     char* result = get_data_by_id(120);
     printf("Message: %s\n", result);
     char* nmessage = "John is the best\n";
