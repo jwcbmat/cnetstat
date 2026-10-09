@@ -1,6 +1,7 @@
 *.exe
 .vscode
 **/*.txt
+**/*.db
 ./src/backup/
 ./src/database
 ./src/main

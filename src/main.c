@@ -12,15 +12,7 @@ char option[10];
 int main()
 {
     storage_start();
-  /*
-    * TESTING NEW FUNCTIONS ON MAIN:
-    char* result = get_data_by_id(120);
-    printf("Message: %s\n", result);
-    char* nmessage = "John is the best\n";
-    post_new_message(nmessage);
-    restore_from_backup();
-    backup_data();
-   */
+
     do {
       printf("Would you like to add a new message? [y/n]: ");
       if (fgets(option, sizeof(option), stdin) != NULL) {
