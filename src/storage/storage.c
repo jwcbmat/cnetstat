@@ -96,7 +96,7 @@ void storage_start() {
         exit(1);
     }
     snprintf(storagef, sizeof(storagef), "%s/backup/data.txt", cwd);
-    snprintf(data_path, sizeof(data_path), "%s/database", cwd);
+    snprintf(data_path, sizeof(data_path), "%s/storage/database.db", cwd);
 
     char backup_path[PATH_MAX];
     snprintf(backup_path, sizeof(backup_path), "%s/backup", cwd);
